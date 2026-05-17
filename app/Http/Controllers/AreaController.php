@@ -3,36 +3,74 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Area;
-use App\Models\Cargo;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
 
 class AreaController extends Controller
 {
     
     public function index(){
         
-        $data=Area::all();
-        return response()->json($data);
+        $mostrar=Area::all();
+
+        if($mostrar->count()<=0){
+
+        return response()->json(['mensaje'=>'No existen registros de Area']);
+
+        }
+
+        return response()->json($mostrar);
 
     }
 
+
+
     public function store(Request $request){
 
-      $area=new Area;
 
-       $valores=$request->validate([
-            'nombre_area'=>'required|unique:areas,nombre_area'   
+    try{
+
+
+        $area=new Area;
+
+        $validador=Validator::make($request->all(),[
+            'nombre_area'=>'required|unique:areas,nombre_area'
         ]);
 
-        $area->nombre_area=$valores['nombre_area'];
+
+        if($validador->fails()){
+
+        return response()->json([
+            'mensaje'=>'El area ya existe',
+            'errores'=>$validador->errors()],422);
+        }
+
+
+        $area->nombre_area=$request->nombre_area;
 
         $area->save();
 
        return response()
-       ->json(['mensaje' => 'Area agregada correctamente'], 200);
+       ->json([
+            'mensaje' => 'Area agregada correctamente',
+            'nombre_area'=> $area->nombre_area
+             ], 200);
+
+    }catch(QueryException $e){
+
+          return response()
+       ->json([
+           'mensaje' => 'Imposible agregar el Area, los valores estan parametrisados',
+        ], 500);
+
+    }
 
 
     }
+
+
 
 
     public function delete($id){
@@ -49,39 +87,77 @@ class AreaController extends Controller
         $aux=$valor['nombre_area'];
 
       return response()
-        ->json(['mensaje'=>'Se elimino correctamente '.$aux],200);
+        ->json([
+             'mensaje'=>'Se elimino correctamente ',
+             'nombre_area'=>$aux
+        ],200);
 
     }
 
 
 
+
+
     public function edit(Request $request, $id){
+    
+    try{
 
-        $area=Area::where('id', $id)->first();
+        $modificar=Area::where('id', $id)->first();
 
 
-        if(!$area){
+        if(!$modificar){
+            
         return response()
-       ->json(['mensaje' => 'No se pudo modificar el Area'], 404);
+       ->json(['mensaje' => 'No se encontro el id a modificar'], 404);
 
         }
-        
-         $request->validate([
-        'nombre_area' => 'required|unique:areas,nombre_area,' . $id
+
+        $validar=Validator::make($request->all(),[
+            'nombre_area' => 'required|unique:areas,nombre_area,' 
+
         ]);
 
+
         
-            $area->nombre_area = $request->nombre_area;
-        $area->save();
+
+        if($validar->fails()){
 
 
-        return response()
-       ->json(['mensaje' => 'Area modificada correctamente'], 201);
-
-
+            return response()->json([
+                'mensaje'=>'Area duplicado'
+            ],402);
         }
 
+        $auxNombreArea=$modificar->nombre_area;
 
+        !$request->exists('nombre_area')?
+        $modificar->nombre_area=$modificar->nombre_area:
+        $modificar->nombre_area=$request->nombre_area;
+
+    
+        $modificar->save();
+        
+
+        return response()
+       ->json([
+        'mensaje' => 'Area modificada correctamente',
+        'nombre_area'=>'Se cambio area: '.$auxNombreArea." Por: ".$request->nombre_area
+       ], 201);
+
+
+     
+        }
+
+  catch(QueryException $ex){
+
+       return response()
+       ->json([
+           'mensaje' => 'Imposible agregar el Area, los valores estan parametrisados',
+        ], 500);
+
+  }
+
+    }
 
 
 }
