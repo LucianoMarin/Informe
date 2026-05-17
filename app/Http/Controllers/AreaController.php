@@ -23,6 +23,7 @@ class AreaController extends Controller
 
         return response()->json($mostrar);
 
+        /* */
     }
 
 
