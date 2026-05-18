@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\ContratoController;
+use App\Http\Controllers\DepartamentoController;
 
 
 /*
@@ -35,3 +36,9 @@ Route::post('/contratos',[ContratoController::class,'store']);
 Route::get('/contratos',[ContratoController::class,'index']);
 Route::delete('/contratos/{id}',[ContratoController::class,'delete']);
 Route::patch('/contratos/{id}',[ContratoController::class,'edit']);
+
+/* CRUD DEPARTAMENTOS */
+Route::post('/departamentos',[DepartamentoController::class,'store']);
+Route::get('/departamentos',[DepartamentoController::class,'index']);
+Route::delete('/departamentos/{id}',[DepartamentoController::class,'delete']);
+Route::patch('/departamentos/{id}',[DepartamentoController::class,'edit']);

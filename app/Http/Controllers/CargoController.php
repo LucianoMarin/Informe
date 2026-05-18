@@ -36,17 +36,20 @@ class CargoController extends Controller
         $cargo=new Cargo;
 
 
-        $validador=Validator::make($request->all(),[
+        $validar=Validator::make($request->all(),[
 
             'tipo_cargo'=>'required|unique:cargos,tipo_cargo'
         ]);
        
 
-        if($validador->fails()){
+        if($validar->fails()){
 
-            return response()->json([
-            'mensaje'=>'Error, duplicacion de cargo'
-            ],402);
+          $error=$validar->errors();
+
+         return response()->json(
+                ['mensaje'=>'Error, al ingresar Cargo',
+                 'Error:'=>$error
+                 ],402);
 
         }
 

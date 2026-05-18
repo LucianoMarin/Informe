@@ -29,7 +29,7 @@ class ContratoController extends Controller
 
 
     public function store(Request $request){
-    try{
+
 
 
     $contrato=new Contrato;
@@ -52,18 +52,21 @@ class ContratoController extends Controller
 
             if($error->has('nombre_contrato')){
 
-                return response()->json([
-                    'mensaje'=>'Error al agregar nombre_contrato'
-                ],500);
+            
+          return response()->json(
+                ['mensaje'=>'Error, al ingresar Nombre Contrato',
+                 'Error:'=>$error
+                 ],402);
 
             }
 
-            if($error->has('grado')){
+            if($error->has('grado')){   
 
 
-                 return response()->json([
-                    'mensaje'=>'Error al agregar grado'
-                ],500);
+             return response()->json(
+                ['mensaje'=>'Error, al ingresar Grado',
+                 'Error:'=>$error
+                 ],402);
 
             }
         }
@@ -76,12 +79,7 @@ class ContratoController extends Controller
 
         return response()->json($contrato); 
 
-    }catch(QueryException $ex){
-
-        return response()->json(['mensaje'=>'Error al ingresar Contrato'],500); 
-
-
-    }
+    
     }
 
 

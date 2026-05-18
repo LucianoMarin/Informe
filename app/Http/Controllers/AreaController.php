@@ -36,16 +36,20 @@ class AreaController extends Controller
 
         $area=new Area;
 
-        $validador=Validator::make($request->all(),[
+        $validar=Validator::make($request->all(),[
             'nombre_area'=>'required|unique:areas,nombre_area'
         ]);
 
 
-        if($validador->fails()){
+        if($validar->fails()){
 
-        return response()->json([
-            'mensaje'=>'El area ya existe',
-            'errores'=>$validador->errors()],422);
+          $error=$validar->errors();
+
+        return response()->json(
+                ['mensaje'=>'Error, al ingresar Area',
+                 'Error:'=>$error
+                 ],402);
+
         }
 
 
