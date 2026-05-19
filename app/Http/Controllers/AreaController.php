@@ -27,7 +27,6 @@ class AreaController extends Controller
     }
 
 
-
     public function store(Request $request){
 
 
@@ -76,20 +75,19 @@ class AreaController extends Controller
     }
 
 
-
-
     public function delete($id){
         
-        $valor=Area::where('id',$id)->first();
+           
+      $buscar = Contrato::find($id); 
 
-        if(!$valor){
+        if($buscar==null){
 
             return response()->json(['mensaje'=>'Id a eliminar no encontrado'],404);
         }
 
-        $valor->delete();
+        $buscar->delete();
 
-        $aux=$valor['nombre_area'];
+        $aux=$buscar['nombre_area'];
 
       return response()
         ->json([
@@ -100,20 +98,17 @@ class AreaController extends Controller
     }
 
 
-
-
-
     public function edit(Request $request, $id){
-    
-    try{
 
-        $modificar=Area::where('id', $id)->first();
+        $buscar=Area::find($id);
 
-
-        if(!$modificar){
-            
-        return response()
-       ->json(['mensaje' => 'No se encontro el id a modificar'], 404);
+        
+        if($buscar==null){
+        return response()->json([
+        
+            'mensaje'=>'Error al editar Area',
+            'error'=>'Id a editar no encontrado'
+                ],404);
 
         }
 
@@ -124,7 +119,6 @@ class AreaController extends Controller
 
 
         
-
         if($validar->fails()){
 
 
@@ -133,36 +127,28 @@ class AreaController extends Controller
             ],402);
         }
 
-        $auxNombreArea=$modificar->nombre_area;
-
-        !$request->exists('nombre_area')?
-        $modificar->nombre_area=$modificar->nombre_area:
-        $modificar->nombre_area=$request->nombre_area;
-
-    
-        $modificar->save();
+      
+        if ($request->filled('nombre_area')) {
+        $buscar->nombre_area = $request->nombre_area;
         
+        }
+        
+        
+        $buscar->save();
 
-        return response()
-       ->json([
-        'mensaje' => 'Area modificada correctamente',
-        'nombre_area'=>'Se cambio area: '.$auxNombreArea." Por: ".$request->nombre_area
-       ], 201);
+       
+
+        return response()->json([
+        'mensaje'=>'Area modificado correctamente',
+        'data '=> $buscar
+                ],200);
 
 
      
         }
 
-  catch(QueryException $ex){
 
-       return response()
-       ->json([
-           'mensaje' => 'Imposible agregar el Area, los valores estan parametrisados',
-        ], 500);
-
-  }
-
-    }
+    
 
 
 }

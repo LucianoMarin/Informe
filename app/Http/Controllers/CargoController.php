@@ -11,129 +11,125 @@ use Illuminate\Support\Facades\Validator;
 
 class CargoController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
-    $mostrar=Cargo::all();
+        $mostrar = Cargo::all();
 
-    if($mostrar->count()<=0){
+        if ($mostrar->count() <= 0) {
 
-        return response()->json(['mensaje'=>'No existen registros de Cargo']);
-
-    }
-
-    return response()->json($mostrar);
-
-    }
-
-
-
-
-    public function store(Request $request){
-
-
-    try{
-
-        $cargo=new Cargo;
-
-
-        $validar=Validator::make($request->all(),[
-
-            'tipo_cargo'=>'required|unique:cargos,tipo_cargo'
-        ]);
-       
-
-        if($validar->fails()){
-
-          $error=$validar->errors();
-
-         return response()->json(
-                ['mensaje'=>'Error, al ingresar Cargo',
-                 'Error:'=>$error
-                 ],402);
-
+            return response()->json(['mensaje' => 'No existen registros de Cargo']);
         }
 
-        $cargo->tipo_cargo=$request->tipo_cargo;
-
-        $cargo->save();
-
-
-        return response()->json([
-            'mensaje'=>'Cargo Agregado',
-            'tipo_cargo'=>$cargo->tipo_cargo
-            ],201);
-
-
-    }catch(QueryException $ex){
-
-        return response()->json([
-            'mensaje'=>'Error al agregar Cargo'
-            ],500);
-
-
-    }
+        return response()->json($mostrar);
     }
 
 
+    public function store(Request $request)
+    {
 
 
-    public function delete($id){
-    $valor=Cargo::where('id',$id)->first();
+        try {
 
-    if(!$valor){
+            $cargo = new Cargo;
 
-        return response()->json([
-            'mensaje'=>'Id a eliminar no encontrado'
-            ],404);
+
+            $validar = Validator::make($request->all(), [
+
+                'tipo_cargo' => 'required|unique:cargos,tipo_cargo'
+            ]);
+
+
+            if ($validar->fails()) {
+
+                $error = $validar->errors();
+
+                return response()->json(
+                    [
+                        'mensaje' => 'Error, al ingresar Cargo',
+                        'Error:' => $error
+                    ],
+                    402
+                );
+            }
+
+            $cargo->tipo_cargo = $request->tipo_cargo;
+
+            $cargo->save();
+
+
+            return response()->json([
+                'mensaje' => 'Cargo Agregado',
+                'tipo_cargo' => $cargo->tipo_cargo
+            ], 201);
+        } catch (QueryException $ex) {
+
+            return response()->json([
+                'mensaje' => 'Error al agregar Cargo'
+            ], 500);
+        }
     }
-        $aux=$valor['tipo_cargo'];
+
+
+    public function delete($id)
+    {
+
+        $valor = Cargo::find($id);
+
+        if ($valor == null) {
+
+            return response()->json([
+                'mensaje' => 'Id a eliminar no encontrado'
+            ], 404);
+        }
+        
+        $aux = $valor['tipo_cargo'];
+        
         $valor->delete();
 
 
         return response()->json([
-            'mensaje'=>'Se elimino '.$aux
-            ],200);
-
+            'mensaje' => 'Se elimino ' . $aux
+        ], 200);
     }
 
 
 
+    public function edit(Request $request, $id)
+    {
+        $buscar = Cargo::find($id);
+
+        if ($buscar == null) {
+            return response()->json([
+
+                'mensaje' => 'Error al editar Cargo',
+                'error' => 'Id a editar no encontrado'
+            ], 404);
+        }
+
+        $validar = Validator::make($request->all(), [
+            'tipo_cargo' => 'required|unique:cargos,tipo_cargo'
+        ]);
 
 
-    public function edit(Request $request, $id){
-        $modificar=Cargo::where('id',$id)->first();
+        if ($validar->fails()) {
 
 
+            return response()->json([
+                'mensaje' => 'Cargo duplicado'
+            ], 402);
+        }
 
-        $validar=Validator::make($request->all(),[
-            'tipo_cargo'=>'required|unique:cargos,tipo_cargo'
-            ]);
 
-            if(!$modificar){
+        if ($request->filled('tipo_cargo')) {
+            $buscar->tipo_cargo = $request->tipo_cargo;
+        }
 
-                return response()->json(['mesaje'=>'Id no encontrado'],404);
-            }
-          
+        $buscar->save();
 
-            if($validar->fails()){
-                return response()->json(['mensaje'=>'Error al modificar cargo',
-                'Errores: '=> $validar->errors()
-                ],500);
-
-            }
-
-                !$request->exists('tipo_cargo')?
-                $modificar->tipo_cargo:
-                $modificar->$request->tipo_cargo;
-        
-
-            $valor->tipo_cargo=$request->tipo_cargo;
-
-            $valor->save();
-
-            return response()->json(['mensaje'=>'Se modifico correctamente el Cargo'],200)
-            ;
-        ;
-
+        return response()->json([
+            'mensaje' => 'Cargo modificado correctamente',
+            'data ' => $buscar
+        ], 200);;;
     }
 }

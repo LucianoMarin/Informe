@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('departamentos', function (Blueprint $table) {
             $table->id();
-            $table->enum('nombre_departamento',['Informatica']);
+            $table->enum('nombre_departamento',['Informatica','Telecomunicaciones']);
         });
     }
 
